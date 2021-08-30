@@ -1,0 +1,14 @@
+[
+    {
+        "client ip": "10.112.244.61",
+        "client name": "client A",
+        "server ip": "10.112.244.60",
+        "server name": "server"
+    },
+    {
+        "client ip": "10.112.244.62",
+        "client name": "client B",
+        "server ip": "10.112.244.60",
+        "server name": "server"
+    }
+]
