@@ -15,7 +15,6 @@ ObcIp = "192.168.200.100"
 ObcPort = 20002
 
 remoteHeader = b'\x1a\xcf\xfc\x1d\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x17p\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-telemeter_resp = remoteHeader + b'\xff' * 1024
 
 pi_ip = "192.168.200.17"  # WLAN
 pi_port = 20002
@@ -36,3 +35,5 @@ ip_list = [
     "192.168.200.202"
     "192.168.200.203"
 ]
+
+

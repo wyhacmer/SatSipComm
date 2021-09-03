@@ -27,6 +27,7 @@ def main_logic():
         ##### 有上传无下传 #####
         if os.path.exists("Files/uploadJson") and not os.path.exists("Files/downloadJson"):
             handle_output_file()
+            os.system("bash downloadName.sh")
             with open("Files/calculator", "a+") as f:
                 f.write("1")
         else:

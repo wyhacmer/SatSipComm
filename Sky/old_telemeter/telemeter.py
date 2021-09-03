@@ -80,7 +80,7 @@ def modify_sip_data(_telemeter_sip_data, last_lab_num):
         return telemeter_sip_data, last_lab_num, _telemeter_sip_data
 
     ##### 遥测运行次数叠加 #####
-    # _telemeter_sip_data.run_number += 1
+    _telemeter_sip_data.run_number += 1
 
     ##### 判断是否有输入文件 #####
     if os.path.exists("Files/uploadJson"):
@@ -121,41 +121,37 @@ def modify_sip_data(_telemeter_sip_data, last_lab_num):
 
 def modify_ai_data(_telemeter_ai_data):
     ##### 判断状态 停止为0 运行为1 #####
-    # try:
-    #    result = os.popen('docker ps| grep k8s_satellite')
-    #    if result.read() == "":
-    #        _telemeter_ai_data.state = numpy.uint8(0)
-    #    else:
-    #        _telemeter_ai_data.state = numpy.uint8(1)
-    # except:
-    #    _telemeter_ai_data.state = numpy.uint8(0)
-    _telemeter_ai_data.state = numpy.uint8(0)
+    try:
+        result = os.popen('docker ps| grep k8s_satellite')
+        if result.read() == "":
+            _telemeter_ai_data.state = numpy.uint8(0)
+        else:
+            _telemeter_ai_data.state = numpy.uint8(1)
+    except:
+        _telemeter_ai_data.state = numpy.uint8(0)
 
     ##### CPU占用率 #####
-    # try:
-        # result = os.popen("top -b -n 1 | grep %Cpu | awk \'{print $2}\' | sed s/\'\..*\'//g ").read().strip('\n')
-        # _cpu = int(result)
-        # _telemeter_ai_data.cpu = numpy.uint8(_cpu)
-    # except:
-        # _telemeter_ai_data.cpu = numpy.uint8(0)
-    _telemeter_ai_data.cpu = numpy.uint8(0)
+    try:
+        result = os.popen("top -b -n 1 | grep %Cpu | awk \'{print $2}\' | sed s/\'\..*\'//g ").read().strip('\n')
+        _cpu = int(result)
+        _telemeter_ai_data.cpu = numpy.uint8(_cpu)
+    except:
+        _telemeter_ai_data.cpu = numpy.uint8(0)
 
     ##### 星上运行次数 #####
-    # try:
-    #    with open('ser_run_num.txt', 'r') as f:
-    #        ser_run_time = f.read().strip('\n')
-    #    _telemeter_ai_data.run_number = numpy.uint8(int(ser_run_time))
-    #except:
-    #    _telemeter_ai_data.run_number = numpy.uint8(0)
-    _telemeter_ai_data.run_number = numpy.uint8(0)
+    try:
+        with open('ser_run_num.txt', 'r') as f:
+            ser_run_time = f.read().strip('\n')
+        _telemeter_ai_data.run_number = numpy.uint8(int(ser_run_time))
+    except:
+        _telemeter_ai_data.run_number = numpy.uint8(0)
 
     ##### 输出文件个数 #####
-    # try:
-    #    result = os.popen('ls -l /home/ubuntu/kubeedge/output | grep "^-" | wc -l').read().strip('\n')
-    #    _telemeter_ai_data.output_file_number = numpy.uint8(int(result))
-    #except:
-    #    _telemeter_ai_data.output_file_number = numpy.uint8(0)
-    _telemeter_ai_data.output_file_number = numpy.uint8(0)
+    try:
+        result = os.popen('ls -l /home/ubuntu/kubeedge/output | grep "^-" | wc -l').read().strip('\n')
+        _telemeter_ai_data.output_file_number = numpy.uint8(int(result))
+    except:
+        _telemeter_ai_data.output_file_number = numpy.uint8(0)
 
     ##### 对ai data进行crc运算 #####
     try:
@@ -174,7 +170,7 @@ def modify_ai_data(_telemeter_ai_data):
 
 def create_telemeter(telemeter, _telemeter_sip_data, last_lab_num, _telemeter_ai_data):
     ##### 序列号累加 #####
-    # telemeter.sequence_num += 1
+    telemeter.sequence_num += 1
     sequence_num_concat = int(telemeter.sequence_num).to_bytes(length=4, byteorder='big', signed=False)
 
     ##### 传输的文件长度 #####
@@ -226,12 +222,10 @@ def main_logic():
     last_lab_num = os.path.getsize("Files/calculator") if os.path.exists("Files/calculator") else 0
 
     while True:
-        ##### response time #####
-        # now = int(time.time())
-        # timeArray = time.localtime(now)
-        # otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-        # print("response: ", otherStyleTime)
-
+        now = int(time.time())
+        timeArray = time.localtime(now)
+        otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+        print(otherStyleTime)
         ##### 监听来自OBC的遥测请求 #####
         telemeter_req, obc_address = s.recvfrom(1024)
         # logging.info("telemeter request = %s; obc address = %s; pi address = %s", telemeter_req, obc_address, pi_address)
@@ -274,16 +268,10 @@ def main_logic():
         ##### 生成遥测回复 #####
         telemeter_resp, last_lab_num, _telemeterSipData, _telemeterAiData = create_telemeter(telemeter, _telemeterSipData, last_lab_num, _telemeterAiData)
 
-        ##### request time #####
-        #now = int(time.time())
-        #timeArray = time.localtime(now)
-        #otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-        # print("request: ", otherStyleTime)
-
         ##### 发送遥测回复给OBC #####
         obc_address = (obc_ip, 20002)
         s.sendto(telemeter_resp, obc_address)
-        #logging.info("telemeter response = %s, time = %s", telemeter_resp, otherStyleTime)
+        # logging.info("telemeter response = %s", telemeter_resp)
 
 
 if __name__ == '__main__':

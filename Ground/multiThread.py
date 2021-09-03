@@ -1,7 +1,5 @@
 import threading
 import Server, ServerB
-from Server import *
-from ServerB import *
 
 if __name__ == '__main__':
     thread1 = threading.Thread(target=Server.ServerRun, args=())
